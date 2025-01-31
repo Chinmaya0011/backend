@@ -5,7 +5,7 @@ const{RtcTokenBuilder,RtcRole}=require("agora-access-token");
 
 dotenv.config();
 const app=express();
-const port=3000;
+const port=3001;
 app.use(cors());
 app.use(express.json());
 
@@ -35,6 +35,8 @@ app.post("/generate-token", (req, res) => {
     rtcRole,
     privilegeExpiredTs
   );
+
+  console.log("Token generated successfully:", token); // Log the generated token
 
   res.json({ token });
 });
