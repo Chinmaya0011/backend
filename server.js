@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const tokenRoutes = require('./routes/tokenRoutes');
+const tokenRoutes = require('./routes/podcastTokenRoutes');
 
 dotenv.config();
 const app = express();
