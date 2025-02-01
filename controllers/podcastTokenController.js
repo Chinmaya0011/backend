@@ -1,12 +1,12 @@
-// controllers/tokenController.js
 const { RtcTokenBuilder, RtcRole } = require('agora-token');
 const LiveStream = require('../models/liveStreamModel'); // Import the model
 
-const generateToken = async (req, res) => {
-  const { channelName, uid, role, title, username } = req.body;
 
-  if (!channelName || uid == null || !role || !title || !username) {
-    return res.status(400).json({ error: 'Channel name, UID, role, title, and username are required' });
+const generateToken = async (req, res) => {
+  const { channelName, uid, role, title, username, eventTime } = req.body;
+
+  if (!channelName || uid == null || !role || !title || !username || !eventTime) {
+    return res.status(400).json({ error: 'Channel name, UID, role, title, username, and eventTime are required' });
   }
 
   const appId = process.env.AGORA_APP_ID;
@@ -31,7 +31,6 @@ const generateToken = async (req, res) => {
       privilegeExpiredTs
     );
 
-    // Save the live stream data to the database
     const newLiveStream = new LiveStream({
       title,
       username,
@@ -39,6 +38,7 @@ const generateToken = async (req, res) => {
       uid,
       role,
       token,
+      eventTime: new Date(eventTime), 
     });
 
     await newLiveStream.save();
@@ -50,7 +50,6 @@ const generateToken = async (req, res) => {
   }
 };
 
-// Controller to get all live streams
 const getLiveStreams = async (req, res) => {
   try {
     const liveStreams = await LiveStream.find(); // Fetch all live streams from the database
@@ -61,4 +60,28 @@ const getLiveStreams = async (req, res) => {
   }
 };
 
-module.exports = { generateToken, getLiveStreams };
+const getUpcomingStreams = async (req, res) => {
+  try {
+    const upcomingStreams = await LiveStream.find({
+      eventTime: { $gt: new Date() }, 
+    }).sort({ eventTime: 1 }); 
+    res.json(upcomingStreams);
+  } catch (error) {
+    console.error('Error fetching upcoming streams:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const getPastStreams = async (req, res) => {
+  try {
+    const pastStreams = await LiveStream.find({
+      eventTime: { $lt: new Date() }, 
+    }).sort({ eventTime: -1 }); 
+    res.json(pastStreams);
+  } catch (error) {
+    console.error('Error fetching past streams:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+module.exports = { generateToken, getLiveStreams, getUpcomingStreams, getPastStreams };
