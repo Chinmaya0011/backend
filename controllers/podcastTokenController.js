@@ -41,7 +41,7 @@ const generateToken = async (req, res) => {
     });
 
     await newLiveStream.save();
-
+console.log("token created sucessfully",token)
     res.json({ token });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
