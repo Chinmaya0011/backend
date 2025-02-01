@@ -1,6 +1,5 @@
 const { RtcTokenBuilder, RtcRole } = require('agora-token');
-const LiveStream = require('../models/liveStreamModel'); // Import the model
-
+const LiveStream = require('../models/liveStreamModel');
 
 const generateToken = async (req, res) => {
   const { channelName, uid, role, title, username, eventTime } = req.body;
@@ -38,24 +37,22 @@ const generateToken = async (req, res) => {
       uid,
       role,
       token,
-      eventTime: new Date(eventTime), 
+      eventTime: new Date(eventTime),
     });
 
     await newLiveStream.save();
 
     res.json({ token });
   } catch (error) {
-    console.error('Error generating token:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
 const getLiveStreams = async (req, res) => {
   try {
-    const liveStreams = await LiveStream.find(); // Fetch all live streams from the database
+    const liveStreams = await LiveStream.find();
     res.json(liveStreams);
   } catch (error) {
-    console.error('Error fetching live streams:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -63,11 +60,10 @@ const getLiveStreams = async (req, res) => {
 const getUpcomingStreams = async (req, res) => {
   try {
     const upcomingStreams = await LiveStream.find({
-      eventTime: { $gt: new Date() }, 
-    }).sort({ eventTime: 1 }); 
+      eventTime: { $gt: new Date() },
+    }).sort({ eventTime: 1 });
     res.json(upcomingStreams);
   } catch (error) {
-    console.error('Error fetching upcoming streams:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -75,13 +71,28 @@ const getUpcomingStreams = async (req, res) => {
 const getPastStreams = async (req, res) => {
   try {
     const pastStreams = await LiveStream.find({
-      eventTime: { $lt: new Date() }, 
-    }).sort({ eventTime: -1 }); 
+      eventTime: { $lt: new Date() },
+    }).sort({ eventTime: -1 });
     res.json(pastStreams);
   } catch (error) {
-    console.error('Error fetching past streams:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-module.exports = { generateToken, getLiveStreams, getUpcomingStreams, getPastStreams };
+const getStreamById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const stream = await LiveStream.findById(id);
+
+    if (!stream) {
+      return res.status(404).json({ error: 'Stream not found' });
+    }
+
+    res.json(stream);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+module.exports = { generateToken, getLiveStreams, getUpcomingStreams, getPastStreams, getStreamById };
