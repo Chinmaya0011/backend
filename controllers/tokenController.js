@@ -1,11 +1,12 @@
 // controllers/tokenController.js
 const { RtcTokenBuilder, RtcRole } = require('agora-token');
+const LiveStream = require('../models/liveStreamModel'); // Import the model
 
-const generateToken = (req, res) => {
-  const { channelName, uid, role } = req.body;
+const generateToken = async (req, res) => {
+  const { channelName, uid, role, title, username } = req.body;
 
-  if (!channelName || uid == null || !role) {
-    return res.status(400).json({ error: 'Channel name, UID, and role are required' });
+  if (!channelName || uid == null || !role || !title || !username) {
+    return res.status(400).json({ error: 'Channel name, UID, role, title, and username are required' });
   }
 
   const appId = process.env.AGORA_APP_ID;
@@ -29,7 +30,19 @@ const generateToken = (req, res) => {
       rtcRole,
       privilegeExpiredTs
     );
-    console.log(token)
+
+    // Save the live stream data to the database
+    const newLiveStream = new LiveStream({
+      title,
+      username,
+      channelName,
+      uid,
+      role,
+      token,
+    });
+
+    await newLiveStream.save();
+
     res.json({ token });
   } catch (error) {
     console.error('Error generating token:', error);
