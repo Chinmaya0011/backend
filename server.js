@@ -3,7 +3,8 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db'); // Import MongoDB connection
 const podcastRoutes = require('./routes/podcastTokenRoutes');
-
+const webinarRoutes=require('./routes/webinarRoutes');
+const friendRequestRoutes=require('./routes/friendRequestRoutes')
 dotenv.config();
 
 // Connect to MongoDB
@@ -34,6 +35,7 @@ app.get('/', (req, res) => {
 
 // Token generation routes
 app.use('/api', podcastRoutes);
+app.use("/api/friends", friendRequestRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
