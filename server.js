@@ -3,8 +3,9 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db'); // Import MongoDB connection
 const podcastRoutes = require('./routes/podcastTokenRoutes');
-const webinarRoutes=require('./routes/webinarRoutes');
-const friendRequestRoutes=require('./routes/friendRequestRoutes')
+const webinarRoutes = require('./routes/webinarRoutes');
+const friendRequestRoutes = require('./routes/friendRequestRoutes');
+
 dotenv.config();
 
 // Connect to MongoDB
@@ -13,21 +14,25 @@ connectDB();
 const app = express();
 const port = process.env.PORT || 3001;
 
-// Allow multiple frontend origins
+// ✅ Correct CORS Configuration
 const corsOptions = {
   origin: [
-    'http://localhost:3001', 
+    'http://localhost:3001',
     'http://localhost:3000',
-    'https://podcast-virid.vercel.app/'  
+    'https://podcast-virid.vercel.app' // ✅ Removed trailing slash
   ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // ✅ Explicitly added OPTIONS method
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 };
 
+// ✅ Use CORS Middleware
+app.use(cors(corsOptions));
+
+// ✅ Handle Preflight Requests for all routes
+app.options('*', cors(corsOptions)); 
 
 // Middleware
-app.use(cors(corsOptions));
 app.use(express.json());
 
 // Home route
