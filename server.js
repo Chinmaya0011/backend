@@ -17,12 +17,14 @@ const port = process.env.PORT || 3001;
 const corsOptions = {
   origin: [
     'http://localhost:3001', 
-    'http://localhost:3000', 
+    'http://localhost:3000',
+    'https://podcast-virid.vercel.app/'  
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 };
+
 
 // Middleware
 app.use(cors(corsOptions));
